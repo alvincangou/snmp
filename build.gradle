@@ -1,0 +1,17 @@
+group 'snmptest'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/org.snmp4j/snmp4j
+    compile group: 'org.snmp4j', name: 'snmp4j', version: '2.5.8'
+    compile group: 'org.snmp4j', name: 'snmp4j-agent', version: '2.6.1'
+}
