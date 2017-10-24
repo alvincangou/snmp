@@ -79,7 +79,7 @@ public class SimpleSnmpClient {
     }
 
     public ResponseEvent send(OID oids[]) throws IOException {
-        PDU trap = new PDU();
+        PDU trap = new PDU(getPDU(oids));
         trap.setType(PDU.TRAP);
         ResponseEvent event = snmp.send(trap, getTarget(), null);
         if(event != null) {
