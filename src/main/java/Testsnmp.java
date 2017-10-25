@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.snmp4j.mp.SnmpConstants.sysDescr;
 
 import org.junit.*;
@@ -29,6 +31,7 @@ import org.snmp4j.util.MultiThreadedMessageDispatcher;
 import org.snmp4j.util.ThreadPool;
 
 public class Testsnmp {
+private boolean result;
     private Snmp snmp = null;
     private Address listenAddress;
     private ThreadPool threadPool;
@@ -36,9 +39,10 @@ public class Testsnmp {
     private int n = 0;
     private long start = -1;
     static Agent agent;
+
     static SimpleSnmpClient client;
     static final OID sysDescr = new OID(".1.3.6.1.2.1.1.1.0");
-    static final OID system = new OID(".1.3.6.1.2.1.1.1.0");
+
     @BeforeClass
     public static void setUp() throws Exception {
         agent = new Agent("0.0.0.0/2001");
@@ -71,7 +75,7 @@ public class Testsnmp {
 
     public void verifySysDescr() throws IOException {
         assertEquals("MySystemDescr", client.getAsString(sysDescr));
-        System.out.println(client.sendTrap(system));
+       // client.sendTrap(system);
     }
     @Test
 
@@ -82,7 +86,7 @@ public class Testsnmp {
         PDU trap = new PDU();
         trap.setType(PDU.TRAP);
 
-        OID oid = new OID("1.2.3.4.5");
+        OID oid = new OID(".1.3.6.1.2.1.1.1.0");
         trap.add(new VariableBinding(SnmpConstants.snmpTrapOID, oid));
         trap.add(new VariableBinding(SnmpConstants.sysUpTime, new TimeTicks(5000))); // put your uptime here
         trap.add(new VariableBinding(SnmpConstants.sysDescr, new OctetString("System Description")));
@@ -98,10 +102,11 @@ public class Testsnmp {
         target.setVersion(SnmpConstants.version2c);
         target.setAddress(targetaddress);
 
+        TransportMapping transport = new DefaultUdpTransportMapping();
 
-         snmp = new Snmp(new DefaultUdpTransportMapping());
+         snmp = new Snmp(transport);
 //Envoi du trap // Send
-        snmp.send(trap, target, null, null);
+
 //Réception du trap
 
 snmp.addCommandResponder(new CommandResponder() {
@@ -122,19 +127,26 @@ snmp.addCommandResponder(new CommandResponder() {
         Vector<? extends VariableBinding> varBinds = event.getPDU()
                 .getVariableBindings();
         if (varBinds != null && !varBinds.isEmpty()) {
+
+
             Iterator<? extends VariableBinding> varIter = varBinds.iterator();
             while (varIter.hasNext()) {
                 VariableBinding var = varIter.next();
                 msg.append(var.toString()).append(";");
             }
         }
+
         System.out.println("Message Received: " + msg.toString());
+
     }
 });
-
-
+trap.getErrorStatus();
+        snmp.listen();
+     snmp.send(trap, target, null, null);
 
 //Test Envoi=Réception
+
+        assertTrue(true);
 
     }
 

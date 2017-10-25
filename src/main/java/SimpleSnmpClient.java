@@ -40,6 +40,7 @@ public class SimpleSnmpClient {
         snmp = new Snmp(transport);
         // Do not forget this line!
         transport.listen();
+        snmp.listen();
     }
 
     public String getAsString(OID oid) throws IOException {
@@ -47,8 +48,8 @@ public class SimpleSnmpClient {
         return event.getResponse().get(0).getVariable().toString();
     }
     public String sendTrap(OID oid) throws IOException {
-        ResponseEvent event = send(new OID[]{oid});
-        return event.getResponse().get(0).getVariable().toString();
+      send(new OID[]{oid});
+return null;
     }
 
     public void getAsString(OID oids,ResponseListener listener) {
@@ -81,11 +82,11 @@ public class SimpleSnmpClient {
     public ResponseEvent send(OID oids[]) throws IOException {
         PDU trap = new PDU(getPDU(oids));
         trap.setType(PDU.TRAP);
-        ResponseEvent event = snmp.send(trap, getTarget(), null);
-        if(event != null) {
-            return event;
-        }
-        throw new RuntimeException("GET timed out");
+
+          snmp.send(trap, getTarget(), null);
+
+
+        return null;
     }
     private Target getTarget() {
         Address targetAddress = GenericAddress.parse(address);
