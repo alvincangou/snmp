@@ -1,25 +1,45 @@
+import com.snmp4j.smi.SmiManager;
+import com.snmp4j.smi.SmiParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.snmp4j.agent.mo.MOAccessImpl;
 import org.snmp4j.smi.*;
 import sun.management.resources.agent;
 
+
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.snmp4j.mp.SnmpConstants.sysDescr;
 
 public class Testtable {
     static Agent agent;
     static SimpleSnmpClient client;
-    static final OID interfacesTable = new OID(".1.3.6.1.2.1.2.2.1");
-
+    static final OID SoftbridgeAlerte    = new OID(".1.3.6.1.2.1.2.2.1");
+    static final OID SoftbridgeAlertvar1 = new OID(".1.3.6.1.2.1.2.2.1.1.1");
     @BeforeClass
     public static void setUp() throws Exception {
+
+
+        try {
+
+            // Compile the MIB modules in a MIB file:
+            SmiManager smiManager = new SmiManager(null, new File("/home/acangou"));
+            String[] moduleNames = smiManager.compile(new File("/home/acangou/MIB.txt"));
+            // Load compiled MIB modules into memory:
+            for (String moduleName : moduleNames) {
+                smiManager.loadModule(moduleName);
+            }
+        } catch (SmiParseException pex) {
+            pex.printStackTrace();
+        }
         agent = new Agent("0.0.0.0/2001");
         agent.start();
         // Build a table. This example is taken from TestAgent and sets up
         // two physical interfaces
-        MOTableBuilder builder = new MOTableBuilder(interfacesTable)
+        MOTableBuilder builder = new MOTableBuilder(SoftbridgeAlerte)
                 .addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_ONLY)
                 .addColumnType(SMIConstants.SYNTAX_OCTET_STRING,MOAccessImpl.ACCESS_READ_ONLY)
                 .addColumnType(SMIConstants.SYNTAX_INTEGER,MOAccessImpl.ACCESS_READ_ONLY)
@@ -59,9 +79,9 @@ public class Testtable {
         // you need, here we use column 2,6 and 8 so we do not verify the complete
         // table
         List<List<String>> tableContents = client.getTableAsStrings(new OID[]{
-                new OID(interfacesTable.toString() + ".2"),
-                new OID(interfacesTable.toString() + ".6"),
-                new OID(interfacesTable.toString() + ".8")});
+                new OID(SoftbridgeAlerte.toString() + ".2"),
+                new OID(SoftbridgeAlerte.toString() + ".6"),
+                new OID(SoftbridgeAlerte.toString() + ".8")});
 
         //and validate here
         assertEquals(2, tableContents.size());
@@ -76,5 +96,16 @@ public class Testtable {
         assertEquals("eth0", tableContents.get(1).get(0));
         assertEquals("00:00:00:00:02", tableContents.get(1).get(1));
         assertEquals("1500", tableContents.get(1).get(2));
+        System.out.println(tableContents.get(0).get(0));
+
+    }
+    @Test
+
+
+    public void verifyTableContentsWoid
+            () throws IOException {
+        assertEquals("1", client.getAsString(SoftbridgeAlertvar1));
+        // client.sendTrap(system);
+
     }
 }

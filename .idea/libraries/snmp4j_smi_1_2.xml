@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="snmp4j-smi-1.2">
+    <CLASSES>
+      <root url="file://$USER_HOME$/snmp4j-smi-1.2.0" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/snmp4j-smi-1.2.0/examples" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/snmp4j-smi-1.2.0" recursive="false" />
+  </library>
+</component>

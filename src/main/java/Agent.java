@@ -1,4 +1,3 @@
-import org.snmp4j.Snmp;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.*;
 import org.snmp4j.agent.mo.MOTableRow;
@@ -107,7 +106,6 @@ public class Agent extends BaseAgent {
         TransportMapping tm = TransportMappings.getInstance()
                 .createTransportMapping(addr);
         transportMappings[0] = tm;
-
     }
 
     /**

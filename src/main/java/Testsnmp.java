@@ -25,6 +25,7 @@ import org.snmp4j.mp.MPv3;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.security.*;
 import org.snmp4j.smi.*;
+import org.snmp4j.transport.AbstractTransportMapping;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.snmp4j.util.MultiThreadedMessageDispatcher;
@@ -39,11 +40,11 @@ private boolean result;
     private int n = 0;
     private long start = -1;
     static Agent agent;
-
+    static Agent agent2;
     static SimpleSnmpClient client;
     static final OID sysDescr = new OID(".1.3.6.1.2.1.1.1.0");
 
-    @BeforeClass
+  @BeforeClass
     public static void setUp() throws Exception {
         agent = new Agent("0.0.0.0/2001");
 
@@ -52,7 +53,7 @@ private boolean result;
         // Since BaseAgent registers some mibs by default we need to unregister
         // one before we register our own sysDescr. Normally you would
         // override that method and register the mibs that you need
-        agent.unregisterManagedObject(agent.getSnmpv2MIB());
+          agent.unregisterManagedObject(agent.getSnmpv2MIB());
 
         // Register a system description, use one from you product environment
         // to test with
@@ -67,6 +68,7 @@ private boolean result;
     @AfterClass
     public static void tearDown() throws Exception {
         agent.stop();
+
         client.stop();
     }
 
@@ -102,17 +104,27 @@ private boolean result;
         target.setVersion(SnmpConstants.version2c);
         target.setAddress(targetaddress);
 
-        TransportMapping transport = new DefaultUdpTransportMapping();
 
-         snmp = new Snmp(transport);
+
+
+
+     //  AbstractTransportMapping transport = new DefaultUdpTransportMapping((UdpAddress)new UdpAddress("0.0.0.0/2001"));
+//CommunityTarget target1 = new CommunityTarget();
+//target.setCommunity(new OctetString("public"));
+         //snmp = new Snmp();
+
+
 //Envoi du trap // Send
 
 //Réception du trap
 
-snmp.addCommandResponder(new CommandResponder() {
+
+agent.getSession().addCommandResponder(new CommandResponder() {
+
     @Override
     public void processPdu(CommandResponderEvent event) {
-        if (start < 0) {
+        System.out.println("listening");
+     /*   if (start < 0) {
             start = System.currentTimeMillis() - 1;
         }
         n++;
@@ -120,7 +132,7 @@ snmp.addCommandResponder(new CommandResponder() {
             System.out.println("Processed "
                     + (n / (double) (System.currentTimeMillis() - start))
                     * 1000 + "/s, total=" + n);
-        }
+        }*/
 
         StringBuffer msg = new StringBuffer();
         msg.append(event.toString());
@@ -141,9 +153,10 @@ snmp.addCommandResponder(new CommandResponder() {
     }
 });
 trap.getErrorStatus();
-        snmp.listen();
-     snmp.send(trap, target, null, null);
-
+      agent.getSession().listen();
+     //   transport.listen();
+   agent.getSession().send(trap, target, null, null);
+//agent.getSession().send(trap,target,null,null);
 //Test Envoi=Réception
 
         assertTrue(true);
