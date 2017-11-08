@@ -18,23 +18,32 @@ public class Testtable {
     static Agent agent;
     static SimpleSnmpClient client;
     static final OID SoftbridgeAlerte    = new OID(".1.3.6.1.2.1.2.2.1");
-    static final OID SoftbridgeAlertvar1 = new OID(".1.3.6.1.2.1.2.2.1.1.1");
+    //static final OID SoftbridgeAlertvar1 = new OID(".1.3.6.1.2.1.2.2.1.1.1");
     @BeforeClass
     public static void setUp() throws Exception {
 
 
-        try {
+       try {
 
             // Compile the MIB modules in a MIB file:
-            SmiManager smiManager = new SmiManager(null, new File("/home/acangou"));
-            String[] moduleNames = smiManager.compile(new File("/home/acangou/MIB.txt"));
+            SmiManager smiManager = new SmiManager("63 15 2d 25 64 6d 71 33 / 2YB4Ci2l", new File("/home/acangou/empty/"));
+           String[] moduleNames = smiManager.compile(new File("/home/acangou/MIB.txt"));
+
             // Load compiled MIB modules into memory:
             for (String moduleName : moduleNames) {
                 smiManager.loadModule(moduleName);
+
             }
+           for (String a:smiManager.getLoadedModuleNames()
+                ) {
+                System.out.println(a);
+
+           }
+
         } catch (SmiParseException pex) {
             pex.printStackTrace();
         }
+
         agent = new Agent("0.0.0.0/2001");
         agent.start();
         // Build a table. This example is taken from TestAgent and sets up
@@ -104,8 +113,13 @@ public class Testtable {
 
     public void verifyTableContentsWoid
             () throws IOException {
-        assertEquals("1", client.getAsString(SoftbridgeAlertvar1));
+        assertEquals("1", client.getAsString(new OID(SoftbridgeAlerte.toString() + ".1.1")));
+        assertEquals("2", client.getAsString(new OID(SoftbridgeAlerte.toString() + ".1.2")));
         // client.sendTrap(system);
-
     }
+
 }
+
+
+
+
