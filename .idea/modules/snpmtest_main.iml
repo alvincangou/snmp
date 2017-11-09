@@ -22,5 +22,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="snmp4j-smi-1.2" level="project" />
   </component>
 </module>

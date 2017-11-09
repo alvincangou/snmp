@@ -45,9 +45,9 @@ private boolean result;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        agent = new Agent("0.0.0.0/2001");
+            agent = new Agent("0.0.0.0/2001");
 
-        agent.start();
+            agent.start();
 
         // Since BaseAgent registers some mibs by default we need to unregister
         // one before we register our own sysDescr. Normally you would
@@ -62,7 +62,7 @@ private boolean result;
 
         // Setup the client to use our newly started agent
         client = new SimpleSnmpClient("udp:127.0.0.1/2001");
-    }
+}
 
     @AfterClass
     public static void tearDown() throws Exception {
