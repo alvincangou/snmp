@@ -39,7 +39,7 @@ public class TrapSender {
         Variable status = new OctetString("some string");
         Variable url = new OctetString("some string");
         TrapSender sender = new TrapSender();
-sender.sendTrap_Param(3,id,category,query,label,status,url);
+sender.sendTrap_Param(1,id,category,query,label,status,url);
 
     }
 
@@ -146,6 +146,7 @@ if (version == 1 ){
             e.printStackTrace();
         }
     }
+
     public void sendTrap_Version3(Variable id, Variable Category, Variable Query, Variable Label , Variable Status, Variable URL) {
         try {
             Address targetAddress = GenericAddress.parse("udp:" + ipAddress
@@ -162,9 +163,9 @@ if (version == 1 ){
 
             snmp.getUSM().addUser(
                     new OctetString("MD5DES"),
-                    new UsmUser(new OctetString("MD5DES"), AuthMD5.ID,
-                            new OctetString("UserName"), PrivAES128.ID,
-                            new OctetString("UserName")));
+                    new UsmUser( new OctetString("MD5DES"), AuthMD5.ID, new OctetString("UserName"), PrivAES128.ID, new OctetString("UserName")));
+   /*       snmp.getUSM().addUser(new OctetString("MD5DES"),
+                  new UsmUser(new OctetString("MD5DES"),null,null,null,null));*/
 
             // Create Target
             UserTarget target = new UserTarget();
@@ -193,7 +194,6 @@ if (version == 1 ){
                     Status.toString())));
             pdu.add(new VariableBinding(new OID(oid6), new OctetString(
                     URL.toString())));
-
             // Send the PDU
             snmp.send(pdu, target);
             System.out.println("Sending Trap to (IP:Port)=> " + ipAddress + ":"
