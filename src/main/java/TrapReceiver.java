@@ -6,12 +6,8 @@ import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.request.SnmpRequest;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.log.LogFactory;
-import org.snmp4j.mp.MPv1;
-import org.snmp4j.mp.MPv2c;
-import org.snmp4j.mp.StateReference;
-import org.snmp4j.mp.StatusInformation;
-import org.snmp4j.security.Priv3DES;
-import org.snmp4j.security.SecurityProtocols;
+import org.snmp4j.mp.*;
+import org.snmp4j.security.*;
 import org.snmp4j.smi.*;
 import org.snmp4j.transport.AbstractTransportMapping;
 import org.snmp4j.transport.DefaultTcpTransportMapping;
@@ -98,7 +94,27 @@ public class TrapReceiver implements CommandResponder
       //  Snmp snmp = new Snmp( transport);
         //snmp.addCommandResponder(this);
 agent.getSession().addCommandResponder(this);
+        //implementing security measure for snmpv3
+        USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(
+                MPv3.createLocalEngineID()), 0);
+        usm.setEngineDiscoveryEnabled(true);
+        agent.getSession().getMessageDispatcher().addMessageProcessingModel(new MPv1());
+        agent.getSession().getMessageDispatcher().addMessageProcessingModel(new MPv2c());
+        agent.getSession().getMessageDispatcher().addMessageProcessingModel(new MPv3(usm));
+        SecurityModels.getInstance().addSecurityModel(usm);
+
+        agent.getSession().getUSM().addUser(
+                new OctetString("MD5DES"),
+                new UsmUser(new OctetString("MD5DES"), AuthMD5.ID,
+                        new OctetString("UserName"), PrivAES128.ID,
+                        new OctetString("UserName")));
+       /* agent.getSession().getUSM().addUser(
+                new OctetString("MD5DES"),
+                new UsmUser(new OctetString("MD5DES"), null,
+                        null, null,
+                        null));*/
         //transport.listen();
+
         agent.getSession().listen();
         System.out.println("Listening on " + address);
 
